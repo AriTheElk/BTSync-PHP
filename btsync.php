@@ -20,7 +20,7 @@ class BTSync {
 
 	/**
 	 * IP:Port for access HTTP API
-	 * @var integer
+	 * @var string
 	 */
 	private $baseURL;
 
