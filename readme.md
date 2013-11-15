@@ -1,4 +1,4 @@
 ## PHP Wrapper for the BitTorrent Sync API
-Documentation located in docs/ folder
+### [Click here to access the documentation →](http://igaret.github.io/BTSync-PHP/)
 
 Enjoy!
