@@ -1,6 +1,6 @@
 <?php
 
-/** 
+/**
  * BTSync - PHP Wrapper for the BitTorrent Sync API
  * @author Garet McKinley <garetmckinley@me.com>
  */
@@ -45,11 +45,11 @@ class BTSync {
 
 
 	/**
-	 * Makes an API call and returns the result
+	 * Makes an API call and returns the decoded result
 	 *
 	 * @param string $params Parameters for the API call
 	 *
-	 * @return string API Result
+	 * @return array API Result
 	 */
 	private function request($params) {
 		$ch = curl_init();
@@ -59,7 +59,10 @@ class BTSync {
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
 		$result = curl_exec($ch);
 		curl_close($ch);
-		return $result;
+		$array = json_decode($result);
+        if (empty($array))
+            return false;
+        return $array;
 	}
 
 
@@ -74,13 +77,9 @@ class BTSync {
 	public function getFolders($secret = null)
 	{
 		if (!is_null($secret))
-			$result = $this->request(sprintf('method=get_folders&secret=%s', $secret));
+			return $this->request(sprintf('method=get_folders&secret=%s', $secret));
 		else
-			$result = $this->request('method=get_folders');
-		$array = json_decode($result);
-		if (empty($array))
-			return false;
-		return $array;
+			return $this->request('method=get_folders');
 	}
 
 
@@ -98,12 +97,9 @@ class BTSync {
 	public function addFolder($dir, $secret = null, $selective = false)
 	{
 		if (!is_null($secret))
-			$result = $this->request(sprintf('method=add_folder&dir=%s&secret=%s&selective_sync=%s', $dir, $secret, intval($selective)));
+			return $this->request(sprintf('method=add_folder&dir=%s&secret=%s&selective_sync=%s', $dir, $secret, intval($selective)));
 		else
-			$result = $this->request(sprintf('method=add_folder&dir=%s&selective_sync=%s', $dir, intval($selective)));
-		$array = json_decode($result);
-		print_r(gettype($array));
-		return $array;
+			return $this->request(sprintf('method=add_folder&dir=%s&selective_sync=%s', $dir, intval($selective)));
 	}
 
 
@@ -118,9 +114,7 @@ class BTSync {
 	 */
 	public function removeFolder($secret)
 	{
-		$result = $this->request(sprintf('method=remove_folder&secret=%s', $secret));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=remove_folder&secret=%s', $secret));
 	}
 
 
@@ -137,11 +131,9 @@ class BTSync {
 	public function getFiles($secret, $path = null)
 	{
 		if (!is_null($path))
-			$result = $this->request(sprintf('method=get_files&secret=%s&path=%s', $secret, $path));
+			return $this->request(sprintf('method=get_files&secret=%s&path=%s', $secret, $path));
 		else
-			$result = $this->request(sprintf('method=get_files&secret=%s', $secret));
-		$array = json_decode($result);
-		return $array;
+			return $this->request(sprintf('method=get_files&secret=%s', $secret));
 	}
 
 
@@ -157,9 +149,7 @@ class BTSync {
 	 */
 	public function setFilePrefs($secret, $path, $download)
 	{
-		$result = $this->request(sprintf('method=set_file_prefs&secret=%s&path=%s&download=%s', $secret, $path, intval($download)));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=set_file_prefs&secret=%s&path=%s&download=%s', $secret, $path, intval($download)));
 	}
 
 
@@ -172,15 +162,13 @@ class BTSync {
 	 */
 	public function getFolderPeers($secret)
 	{
-		$result = $this->request(sprintf('method=get_folder_peers&secret=%s', $secret));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=get_folder_peers&secret=%s', $secret));
 	}
 
 
 	/**
 	 * Generates read-write, read-only and encryption read-only secrets.
-	 * If ‘secret’ parameter is specified, will return secrets available 
+	 * If ‘secret’ parameter is specified, will return secrets available
 	 * for sharing under this secret.
 	 *
 	 * @param string $secret (Required) Folder secret
@@ -191,11 +179,9 @@ class BTSync {
 	public function getSecrets($secret, $type = null)
 	{
 		if ($type == 'encrypted')
-			$result = $this->request(sprintf('method=get_secrets&secret=%s&type=%s', $secret, $type));
+			return $this->request(sprintf('method=get_secrets&secret=%s&type=%s', $secret, $type));
 		else
-			$result = $this->request(sprintf('method=get_secrets&secret=%s', $secret));
-		$array = json_decode($result);
-		return $array;
+			return $this->request(sprintf('method=get_secrets&secret=%s', $secret));
 	}
 
 
@@ -208,9 +194,7 @@ class BTSync {
 	 */
 	public function getFolderPrefs($secret)
 	{
-		$result = $this->request(sprintf('method=get_folder_prefs&secret=%s', $secret));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=get_folder_prefs&secret=%s', $secret));
 	}
 
 
@@ -229,9 +213,7 @@ class BTSync {
 			if ($value !== end($params))
 				$prefs .= '&';
 		}
-		$result = $this->request(sprintf('method=set_folder_prefs&secret=%s&%s', $secret, $prefs));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=set_folder_prefs&secret=%s&%s', $secret, $prefs));
 	}
 
 
@@ -245,9 +227,7 @@ class BTSync {
 	 */
 	public function getFolderHosts($secret)
 	{
-		$result = $this->request(sprintf('method=get_folder_hosts&secret=%s', $secret));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=get_folder_hosts&secret=%s', $secret));
 	}
 
 
@@ -270,9 +250,7 @@ class BTSync {
 			if ($host !== end($hosts))
 				$hostString .= ',';
 		}
-		$result = $this->request(sprintf('method=set_folder_hosts&secret=%s&hosts=%s', $secret, $hostString));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=set_folder_hosts&secret=%s&hosts=%s', $secret, $hostString));
 	}
 
 
@@ -285,15 +263,13 @@ class BTSync {
 	 */
 	public function getPrefs()
 	{
-		$result = $this->request('method=get_prefs');
-		$array = json_decode($result);
-		return $array;
+		return $this->request('method=get_prefs');
 	}
 
 
 	/**
 	 * Sets BitTorrent Sync preferences. Parameters are the same
-	 * as in ‘Get preferences’. Advanced preferences are set as 
+	 * as in ‘Get preferences’. Advanced preferences are set as
 	 * general settings. Returns current settings.
 	 *
 	 * @param array (Required) { device_name, download_limit, lang, listening_port, upload_limit, use_upnp }
@@ -307,10 +283,7 @@ class BTSync {
 			if ($value !== end($params))
 				$prefs .= '&';
 		}
-		return $prefs;
-		$result = $this->request(sprintf('method=set_prefs&%s', $prefs));
-		$array = json_decode($result);
-		return $array;
+		return $this->request(sprintf('method=set_prefs&%s', $prefs));
 	}
 
 
@@ -321,9 +294,7 @@ class BTSync {
 	 */
 	public function getOS()
 	{
-		$result = $this->request('method=get_os');
-		$array = json_decode($result);
-		return $array;
+		return $this->request('method=get_os');
 	}
 
 
@@ -334,9 +305,7 @@ class BTSync {
 	 */
 	public function getVersion()
 	{
-		$result = $this->request('method=get_version');
-		$array = json_decode($result);
-		return $array;
+		return $this->request('method=get_version');
 	}
 
 
@@ -347,9 +316,7 @@ class BTSync {
 	 */
 	public function getSpeed()
 	{
-		$result = $this->request('method=get_speed');
-		$array = json_decode($result);
-		return $array;
+		return $this->request('method=get_speed');
 	}
 
 
@@ -360,9 +327,7 @@ class BTSync {
 	 */
 	public function shutdown()
 	{
-		$result = $this->request('method=shutdown');
-		$array = json_decode($result);
-		return $array;
+		return $this->request('method=shutdown');
 	}
 
 
